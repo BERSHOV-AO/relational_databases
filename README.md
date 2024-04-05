@@ -43,17 +43,14 @@ primary key (code),
 foreign key (model) references devices.product (model)
 );
 
---********************************product***************************************
-
---insert into devices.product (maker, model, type) values
---('HP','HP Omen 17', 'laptop'),
---('Acer','Acer Aspire TC-1660', 'pc'),
---('DEXP','DEXP MINI ENTRY', 'pc'),
---('Pantum','Pantum P2518', 'printer');
+-- ----------------------------------product-------------------------------------
 
 insert into devices.product (maker, model, type) values ('HP','HP Omen 17', 'laptop');
 insert into devices.product (maker, model, type) values ('HP','HP ProBook 450', 'laptop');
 insert into devices.product (maker, model, type) values ('Acer','Acer Aspire S3', 'laptop');
+insert into devices.product (maker, model, type) values ('ASUS','ASUS ExpertBook B1502CGA', 'laptop');
+insert into devices.product (maker, model, type) values ('Dell','Dell Inspiron G', 'laptop');
+insert into devices.product (maker, model, type) values ('ASUS','ASUS K53E', 'laptop');
 
 
 insert into devices.product (maker, model, type) values ('Acer','Acer Aspire TC-1660', 'pc');
@@ -62,11 +59,15 @@ insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas H420
 insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas H350', 'pc');
 insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas 1', 'pc');
 insert into devices.product (maker, model, type) values ('HP','HP Desktop Pro 300', 'pc');
+insert into devices.product (maker, model, type) values ('Dell','Dell OptiPlex Intel Pentium 2', 'pc');
 
 
 insert into devices.product (maker, model, type) values ('Pantum','Pantum P2518', 'printer');
+insert into devices.product (maker, model, type) values ('Pantum','Pantum P3900', 'printer');
 insert into devices.product (maker, model, type) values ('SAMSUNG ','SAMSUNG COLOR LASER SL-C4010ND', 'printer');
 insert into devices.product (maker, model, type) values ('HP','HP Color LaserJet 150nw', 'printer');
+insert into devices.product (maker, model, type) values ('HP','HP Color LaserJet Enterprise M554dn', 'printer');
+insert into devices.product (maker, model, type) values ('Canon','Canon i-Sensys LBP633', 'printer');
 
 -- --------------------------------laptop-------------------------------------------
 
@@ -76,6 +77,12 @@ insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
 (102,'HP ProBook 450',2300,1200,250,15,1300);
 insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
 (103,'Acer Aspire S3',900,250,80,15,150);
+insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
+(104,'ASUS ExpertBook B1502CGA',3100,1200,480,15,2100);
+insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
+(105,'Dell Inspiron G',150,80,60,15,30);
+insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
+(106,'ASUS K53E',120,80,80,15,42);
 
 -- ---------------------------------pc---------------------------------------------
 
@@ -91,6 +98,8 @@ insert into devices.pc (code, model, speed, ram, hd, cd, price) values
 (205,'DEXP Atlas 1',1800,900,250,'12x',550);
 insert into devices.pc (code, model, speed, ram, hd, cd, price) values
 (206,'HP Desktop Pro 300',3500,900,800,'24x',1700);
+insert into devices.pc (code, model, speed, ram, hd, cd, price) values
+(207,'Dell OptiPlex Intel Pentium 2',300,150,120,'12x',50);
 
 -- ---------------------------------printer------------------------------------------
 
@@ -100,6 +109,14 @@ insert into devices.printer (code, model, color, type, price) values
 (302,'SAMSUNG COLOR LASER SL-C4010ND','w','Laser',90);
 insert into devices.printer (code, model, color, type, price) values
 (303,'HP Color LaserJet 150nw','c','Laser',300);
+insert into devices.printer (code, model, color, type, price) values
+(304,'Canon i-Sensys LBP633','c','Laser',420);
+insert into devices.printer (code, model, color, type, price) values
+(305,'HP Color LaserJet Enterprise M554dn','c','Laser',740);
+insert into devices.printer (code, model, color, type, price) values
+(306,'Pantum P3900','c','Laser',75);
+
+
 
 
 --print tables ----------------------------------------------------------------------
@@ -142,6 +159,43 @@ union
 select p.model, price from devices.product p, devices.pc c where p.model = c.model and p.maker = 'HP'
 union
 select p.model, price from devices.product p, devices.printer pr where p.model = pr.model and p.maker = 'HP';
+
+--task8
+select distinct maker from devices.product where devices.product.type in ('pc');
+
+--task9
+select distinct maker from devices.product p, devices.pc c where p.model = c.model and c.speed >= 450;
+
+--task10
+select model, price from devices.printer where price = (select max(price) from devices.printer);
+
+--task11
+select round(avg(speed)) as speed_avg_pc from devices.pc;
+
+--task12
+select round(avg(speed)) as speed_avg_lap from devices.laptop where price::numeric > 1000;
+
+--task13
+select round(avg(speed)) as speed_avg_pc_maker from devices.product, devices.pc where devices.product.model = devices.pc.model and maker = 'DEXP';
+
+--task14
+select speed, round(avg(price::numeric)) as price_avg from devices.pc group by speed;
+
+--task15
+select hd from devices.pc group by hd having count(*) >= 2;
+
+--task16
+select max(code), min(code), speed, ram from devices.pc group by speed, ram having count(*) >= 2;
+
+--task17
+select distinct type, devices.laptop.model, speed from devices.product, devices.laptop where type = 'laptop' AND
+speed < (select min(speed) FROM devices.pc);
+
+--task18
+select maker, min(price) as price_min from devices.product p, devices.printer r  where p.model = r.model and r.color = 'c' group by maker;
+
+--task19
+
 
 
 
