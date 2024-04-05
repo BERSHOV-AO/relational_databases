@@ -51,14 +51,18 @@ insert into devices.product (maker, model, type) values ('Acer','Acer Aspire S3'
 insert into devices.product (maker, model, type) values ('ASUS','ASUS ExpertBook B1502CGA', 'laptop');
 insert into devices.product (maker, model, type) values ('Dell','Dell Inspiron G', 'laptop');
 insert into devices.product (maker, model, type) values ('ASUS','ASUS K53E', 'laptop');
+insert into devices.product (maker, model, type) values ('ASUS','ASUS VivoBook X540', 'laptop');
 
 
 insert into devices.product (maker, model, type) values ('Acer','Acer Aspire TC-1660', 'pc');
+insert into devices.product (maker, model, type) values ('Acer','Acer Predator Orion 3000', 'pc');
 insert into devices.product (maker, model, type) values ('DEXP','DEXP MINI ENTRY', 'pc');
 insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas H420', 'pc');
 insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas H350', 'pc');
 insert into devices.product (maker, model, type) values ('DEXP','DEXP Atlas 1', 'pc');
 insert into devices.product (maker, model, type) values ('HP','HP Desktop Pro 300', 'pc');
+insert into devices.product (maker, model, type) values ('HP','HP Desktop Pro 290', 'pc');
+insert into devices.product (maker, model, type) values ('HP','HP Vectra', 'pc');
 insert into devices.product (maker, model, type) values ('Dell','Dell OptiPlex Intel Pentium 2', 'pc');
 
 
@@ -83,6 +87,8 @@ insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
 (105,'Dell Inspiron G',150,80,60,15,30);
 insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
 (106,'ASUS K53E',120,80,80,15,42);
+insert into devices.laptop (code, model, speed, ram, hd, screen, price) values
+(107,'ASUS VivoBook X540',500,120,180,19,110);
 
 -- ---------------------------------pc---------------------------------------------
 
@@ -100,6 +106,12 @@ insert into devices.pc (code, model, speed, ram, hd, cd, price) values
 (206,'HP Desktop Pro 300',3500,900,800,'24x',1700);
 insert into devices.pc (code, model, speed, ram, hd, cd, price) values
 (207,'Dell OptiPlex Intel Pentium 2',300,150,120,'12x',50);
+insert into devices.pc (code, model, speed, ram, hd, cd, price) values
+(208,'HP Desktop Pro 290',2800,500,250,'24x',1200);
+insert into devices.pc (code, model, speed, ram, hd, cd, price) values
+(209,'Acer Predator Orion 3000',4900,1500,2000,'32x',5100);
+insert into devices.pc (code, model, speed, ram, hd, cd, price) values
+(210,'HP Vectra',7777,10,15,'1x',5555);
 
 -- ---------------------------------printer------------------------------------------
 
@@ -195,7 +207,33 @@ speed < (select min(speed) FROM devices.pc);
 select maker, min(price) as price_min from devices.product p, devices.printer r  where p.model = r.model and r.color = 'c' group by maker;
 
 --task19
+select maker, round(avg(screen)) as screen_avg from devices.product p, devices.laptop l where p.model = l.model group by maker;
 
+--task20
+select maker, count(model) count from devices.product where product.type = 'pc' group by maker having count(*) >= 3;
+
+--task21
+select maker, max(price) as pr_max from devices.product p, devices.pc c where p.model = c.model group by maker;
+
+--task22
+select speed, round(avg(price::numeric)) as price_avq from devices.pc group by speed having speed > 600;
+
+--task23
+select distinct maker FROM devices.product where type = 'laptop' and maker in
+(select maker from devices.product where type = 'pc' and maker in
+(select maker from devices.pc c, devices.laptop l WHERE c.speed >=750 and l.speed >=750));
+
+--task24
+select distinct code from devices.laptop l where l.price = (select max(price) from devices.laptop)
+union
+select code FROM devices.pc c where c.price = (select max(price) from devices.pc)
+union
+select code from devices.printer p where p.price = (select max(price) from devices.printer);
+
+--task25
+select distinct maker from devices.product where type = 'printer' and maker in
+(select maker from devices.product JOIN devices.pc on devices.product.model = devices.pc.model where type = 'pc' and
+ram = (select min(ram) from devices.pc) and devices.pc.speed = (select max(speed) from devices.pc));
 
 
 
